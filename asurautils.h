@@ -46,7 +46,7 @@ typedef struct _OBJECT_ATTRIBUTES
 }OBJECT_ATTRIBUTES, * POBJECT_ATTRIBUTES;
 
 
-typedef __kernel_entry NTSTATUS(NTAPI* NtCreateFile)(
+typedef NTSTATUS(NTAPI* NtCreateFile)(
     _Out_ PHANDLE FileHandle,
     _In_ ACCESS_MASK DesiredAccess,
     _In_ POBJECT_ATTRIBUTES ObjectAttributes,
