@@ -1,6 +1,13 @@
 #pragma once
 #pragma comment (lib, "ntdll")
+
+
 #include <windows.h>
+#include <iostream>
+#include <sstream>
+#include <vector>
+#include <dirent.h>
+
 #define __kernel_entry __allowed(on_function)
 #define FILE_SUPERSEDED 0x00000000
 #define FILE_OPENED 0x00000001
@@ -8,6 +15,8 @@
 #define FILE_OVERWRITTEN 0x00000003
 #define FILE_EXISTS 0x00000004
 #define FILE_DOES_NOT_EXIST 0x00000005
+
+//------------------------ Structures ------------------------
 
 typedef struct _PS_ATTRIBUTE {
     ULONGLONG Attribute;
@@ -45,6 +54,7 @@ typedef struct _OBJECT_ATTRIBUTES
     VOID* SecurityQualityOfService;                                         //0x28
 }OBJECT_ATTRIBUTES, * POBJECT_ATTRIBUTES;
 
+//------------------------ Native function structures ------------------------
 
 typedef NTSTATUS(NTAPI* NtCreateFile)(
     _Out_ PHANDLE FileHandle,
@@ -59,3 +69,8 @@ typedef NTSTATUS(NTAPI* NtCreateFile)(
     _In_reads_bytes_opt_(EaLength) PVOID EaBuffer,
     _In_ ULONG EaLength
 );
+
+// ------------------------ Not Native stuff ------------------------
+
+int fileCreation (const std::string &path);
+void itereate_subdirs(const std::string &dir_path, std::vector <std::string> &dirs);
