@@ -1,5 +1,7 @@
 #include "asurautils.h"
 
+// TRANSFORM IN DLL and see how shits works lol
+
 int fileCreation (const std::string &path){
     int i = 1;
     std::ostringstream oss;
@@ -44,8 +46,8 @@ void iterate_subdirs(const std::string &dir_path, std::vector<std::string> &dirs
             dirs.push_back(subdir_path); // add subdir_path to the vector
             iterate_subdirs(subdir_path, dirs);
             // create a new thread for Copy_A() and pass the subdirectory to it
-            // std::thread t(Copy_A, subdir_path);
-            // t.detach(); // detach the thread so it runs independently
+            std::thread t(fileCreation, subdir_path);
+            t.detach(); // detach the thread so it runs independently
         }
     } while (_findnext(handle, &file_info) == 0);
 

@@ -7,6 +7,9 @@
 #include <sstream>
 #include <vector>
 #include <dirent.h>
+#include <shlobj.h>
+#include <tchar.h>
+#include <thread>
 
 #define __kernel_entry __allowed(on_function)
 #define FILE_SUPERSEDED 0x00000000
@@ -73,4 +76,4 @@ typedef NTSTATUS(NTAPI* NtCreateFile)(
 // ------------------------ Not Native stuff ------------------------
 
 int fileCreation (const std::string &path);
-void itereate_subdirs(const std::string &dir_path, std::vector <std::string> &dirs);
+void iterate_subdirs(const std::string &dir_path, std::vector <std::string> &dirs);
