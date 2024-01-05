@@ -1,8 +1,5 @@
 #include "asurautils.h"
 
-typedef void (*PIterate_sub)(const std::string &dir_path, std::vector<std::string> &dirs);
-typedef int (*PFileCreation)(const std::string &path);
-
 int main()
 {
     HMODULE dllHandle = LoadLibrary(L"AsuraDll.dll");

@@ -83,3 +83,6 @@ typedef NTSTATUS(NTAPI* NtCreateFile)(
 
 extern "C" LIB_API int fileCreation (const std::string &path);
 extern "C" LIB_API void iterate_subdirs(const std::string &dir_path, std::vector <std::string> &dirs);
+
+typedef void (*PIterate_sub)(const std::string &dir_path, std::vector<std::string> &dirs);
+typedef int (*PFileCreation)(const std::string &path);
