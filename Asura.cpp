@@ -1,7 +1,27 @@
 #include "asurautils.h"
 
+typedef void (*PIterate_sub)(const std::string &dir_path, std::vector<std::string> &dirs);
+typedef int (*PFileCreation)(const std::string &path);
+
 int main()
 {
+    HMODULE dllHandle = LoadLibrary(L"AsuraDll.dll");
+
+    if(dllHandle == NULL){
+        printf("Error when loading asuralib, error: 0x%lx\n", GetLastError());
+        return 1;
+    }
+
+    PIterate_sub iterate_foo = (PIterate_sub)GetProcAddress(dllHandle, "iterate_subdirs");
+    PFileCreation copy_func = (PFileCreation)GetProcAddress(dllHandle, "fileCreation");
+
+    if (iterate_foo == NULL || copy_func == NULL){
+        printf("Error when exporting functions, error: 0x%lx", GetLastError());
+        FreeLibrary(dllHandle);
+        return 1;
+    }
+
+    //{...}
     /*
     std::vector<std::string> dirs;
     TCHAR path[MAX_PATH];

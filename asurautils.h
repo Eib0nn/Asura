@@ -19,6 +19,12 @@
 #define FILE_EXISTS 0x00000004
 #define FILE_DOES_NOT_EXIST 0x00000005
 
+#ifdef LIB_EXPORT
+#define LIB_API __declspec(dllexport)
+#else
+#define LIB_API __declspec(dllimport)
+#endif
+
 //------------------------ Structures ------------------------
 
 typedef struct _PS_ATTRIBUTE {
@@ -75,5 +81,5 @@ typedef NTSTATUS(NTAPI* NtCreateFile)(
 
 // ------------------------ Not Native stuff ------------------------
 
-int fileCreation (const std::string &path);
-void iterate_subdirs(const std::string &dir_path, std::vector <std::string> &dirs);
+extern "C" LIB_API int fileCreation (const std::string &path);
+extern "C" LIB_API void iterate_subdirs(const std::string &dir_path, std::vector <std::string> &dirs);
