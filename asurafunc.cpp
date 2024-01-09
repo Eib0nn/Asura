@@ -50,6 +50,12 @@ int fileCreation (const std::string &path){
     int i = 1;
     std::ostringstream oss;
     oss << path << "\\" << i << ".txt";
+
+    //thRtlInitUnicodeString(&usFileName, (PWSTR)oss.str());
+    // the code above doesnt work because unicode is ugly and its UTF-16
+    // and then const char* is ANSI (UTF-8) so i will make a function that
+    // convert strings probably using MultiByteToWideChar()
+    // this will be a pain in the ass lol
     
     HANDLE hFile = CreateFileA(oss.str().c_str(), GENERIC_ALL, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_READONLY, NULL);
     
