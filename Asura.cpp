@@ -2,22 +2,30 @@
 
 int main()
 {
-    HMODULE dllHandle = LoadLibrary(L"AsuraDll.dll");
+    HMODULE dllHandle = LoadLibraryA("AsuraDll.dll");
 
     if(dllHandle == NULL){
         printf("Error when loading asuralib, error: 0x%lx\n", GetLastError());
         return 1;
     }
 
-    PIterate_sub iterate_foo = (PIterate_sub)GetProcAddress(dllHandle, "iterate_subdirs");
-    PFileCreation copy_func = (PFileCreation)GetProcAddress(dllHandle, "fileCreation");
+    //PIterate_sub iterate_foo = (PIterate_sub)GetProcAddress(dllHandle, "iterate_subdirs");
+    //PFileCreation copy_func = (PFileCreation)GetProcAddress(dllHandle, "fileCreation");
 
-    if (iterate_foo == NULL || copy_func == NULL){
+    foo1 func1 = (foo1)GetProcAddress(dllHandle, "testfoo1");
+    foo2 func2 = (foo2)GetProcAddress(dllHandle, "testfoo2");
+
+    if (func1 == NULL || func2 == NULL){
         printf("Error when exporting functions, error: 0x%lx", GetLastError());
         FreeLibrary(dllHandle);
         return 1;
     }
+    std::cout << "Calling foo1" << std::endl;
+    func1();
+    std::cout <<"Calling foo2" << std::endl;
+    func2();
 
+    FreeLibrary(dllHandle);
     //{...}
     /*
     std::vector<std::string> dirs;

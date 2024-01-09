@@ -19,7 +19,7 @@
 #define FILE_EXISTS 0x00000004
 #define FILE_DOES_NOT_EXIST 0x00000005
 
-#ifdef LIB_EXPORT
+#ifdef BUILDING_DLL
 #define LIB_API __declspec(dllexport)
 #else
 #define LIB_API __declspec(dllimport)
@@ -63,6 +63,13 @@ typedef struct _OBJECT_ATTRIBUTES
     VOID* SecurityQualityOfService;                                         //0x28
 }OBJECT_ATTRIBUTES, * POBJECT_ATTRIBUTES;
 
+typedef struct _UNICODE_STRING
+{
+    USHORT Length;
+    USHORT MaximumLength;
+    PWSTR Buffer;
+} UNICODE_STRING, *PUNICODE_STRING;
+
 //------------------------ Native function structures ------------------------
 
 typedef NTSTATUS(NTAPI* NtCreateFile)(
@@ -79,12 +86,19 @@ typedef NTSTATUS(NTAPI* NtCreateFile)(
     _In_ ULONG EaLength
 );
 
+typedef NTSTATUS(NTAPI* RtlInitUnicodeString)(
+    PUNICODE_STRING DestinationString,
+    PCWSTR SourceString
+);
+
 // ------------------------ Not Native stuff ------------------------
 
 extern "C" LIB_API int fileCreation (const std::string &path);
 extern "C" LIB_API void iterate_subdirs(const std::string &dir_path, std::vector <std::string> &dirs);
 extern "C" LIB_API void testfoo1(); // make another one and put them in asuradll
+extern "C" LIB_API void testfoo2();
 
 typedef void (*PIterate_sub)(const std::string &dir_path, std::vector<std::string> &dirs);
 typedef int (*PFileCreation)(const std::string &path);
 typedef void (*foo1)();
+typedef void (*foo2)();

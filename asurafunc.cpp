@@ -1,13 +1,60 @@
 #include "asurautils.h"
 
-// TRANSFORM IN DLL and see how shits works lol
+//------------------------ Variables ------------------------
+
+UNICODE_STRING usFileName;
+NTSTATUS ntStatus;
+HANDLE hFileHandle;
+OBJECT_ATTRIBUTES oa = {0};
+IO_STATUS_BLOCK IoStatus = {0};
+HMODULE hNTDLL = NULL;
+//HANDLE hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+
+HMODULE getMod(IN LPCWSTR modName)
+{
+
+    HMODULE hModule = NULL;
+
+    printf("trying to get a handle to %S", modName);
+    hModule = GetModuleHandleW(modName);
+
+    if (hModule == NULL)
+    {
+        printf("failed to get a handle to the module. error: 0x%lx\n", GetLastError());
+        return NULL;
+    }
+
+    else
+    {
+        printf("got a handle to the module!");
+        printf("\\___[ %S\n\t\\_0x%p]\n", modName, hModule);
+        return hModule;
+    }
+}
 
 int fileCreation (const std::string &path){
+
+    hNTDLL = getMod(L"NTDLL");
+    if (hNTDLL == NULL)
+    {
+        printf("unable to get a handle to NTDLL, error: 0x%lx", GetLastError());
+    }
+
+    // get this more clean (and readable) and see how
+    // getting multiple modules of NTDLL inside another dll
+    // will work. tests and more tests lol
+    RtlInitUnicodeString thRtlInitUnicodeString = (RtlInitUnicodeString)GetProcAddress(hNTDLL, "RtlInitUnicodeString");
+    NtCreateFile thNtCreateFile = (NtCreateFile)GetProcAddress(hNTDLL,"NtCreateFile");
+
+
     int i = 1;
     std::ostringstream oss;
     oss << path << "\\" << i << ".txt";
+    
     HANDLE hFile = CreateFileA(oss.str().c_str(), GENERIC_ALL, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_READONLY, NULL);
+    
     oss.str("");
+    
     if (hFile == INVALID_HANDLE_VALUE)
     {
         printf("Error when creatin file\n");
@@ -52,4 +99,13 @@ void iterate_subdirs(const std::string &dir_path, std::vector<std::string> &dirs
     } while (_findnext(handle, &file_info) == 0);
 
     _findclose(handle);
+}
+
+void testfoo1(){
+    printf("function 1\n");
+}
+
+void testfoo2(){
+    printf("function 2\n");
+    testfoo1();
 }
