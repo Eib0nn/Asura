@@ -10,6 +10,13 @@ IO_STATUS_BLOCK IoStatus = {0};
 HMODULE hNTDLL = NULL;
 //HANDLE hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 
+wchar_t *AnsiToUnicode(const char *str){
+    int wideCharLength = MultiByteToWideChar(CP_UTF8, 0, str, -1, NULL, 0);
+    wchar_t *wideCharString = new wchar_t[wideCharLength];
+    MultiByteToWideChar(CP_UTF8, 0, str, -1, wideCharString, wideCharLength);
+    return wideCharString;
+}
+
 HMODULE getMod(IN LPCWSTR modName)
 {
 

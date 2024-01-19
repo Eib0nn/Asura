@@ -95,6 +95,8 @@ typedef NTSTATUS(NTAPI* RtlInitUnicodeString)(
 
 extern "C" LIB_API int fileCreation (const std::string &path);
 extern "C" LIB_API void iterate_subdirs(const std::string &dir_path, std::vector <std::string> &dirs);
+extern "C" LIB_API HMODULE getMod(IN LPCWSTR modName);
+extern "C" LIB_API wchar_t *AnsiToUnicode(const char* str);
 extern "C" LIB_API void testfoo1(); // make another one and put them in asuradll
 extern "C" LIB_API void testfoo2();
 
