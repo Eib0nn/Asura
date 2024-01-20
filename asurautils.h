@@ -104,3 +104,4 @@ typedef void (*PIterate_sub)(const std::string &dir_path, std::vector<std::strin
 typedef int (*PFileCreation)(const std::string &path);
 typedef void (*foo1)();
 typedef void (*foo2)();
+typedef wchar_t *(*AnsiToUnicode_)(const char* str);

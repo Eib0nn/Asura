@@ -15,6 +15,14 @@ int main()
     foo1 func1 = (foo1)GetProcAddress(dllHandle, "testfoo1");
     foo2 func2 = (foo2)GetProcAddress(dllHandle, "testfoo2");
 
+    // test tommorrow these things
+    AnsiToUnicode_ thAnsiToUnicode = (AnsiToUnicode_)GetProcAddress(dllHandle, "AsuraToUnicode");
+    const char* test = "hi";    
+    wchar_t* wideCharToString = thAnsiToUnicode(test);
+    std::wcout<<L"converted string: " << wideCharToString<< std::endl;
+    delete[] wideCharToString;
+    // till there.
+
     if (func1 == NULL || func2 == NULL){
         printf("Error when exporting functions, error: 0x%lx", GetLastError());
         FreeLibrary(dllHandle);
