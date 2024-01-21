@@ -18,6 +18,19 @@
 #define FILE_OVERWRITTEN 0x00000003
 #define FILE_EXISTS 0x00000004
 #define FILE_DOES_NOT_EXIST 0x00000005
+#define OBJ_PROTECT_CLOSE 0x00000001
+#define OBJ_INHERIT 0x00000002
+#define OBJ_AUDIT_OBJECT_CLOSE 0x00000004
+#define OBJ_PERMANENT 0x00000010
+#define OBJ_EXCLUSIVE 0x00000020
+#define OBJ_CASE_INSENSITIVE 0x00000040
+#define OBJ_OPENIF 0x00000080
+#define OBJ_OPENLINK 0x00000100
+#define OBJ_KERNEL_HANDLE 0x00000200
+#define OBJ_FORCE_ACCESS_CHECK 0x00000400
+#define OBJ_IGNORE_IMPERSONATED_DEVICEMAP 0x00000800
+#define OBJ_DONT_REPARSE 0x00001000
+#define OBJ_VALID_ATTRIBUTES 0x00001ff2
 
 #ifdef BUILDING_DLL
 #define LIB_API __declspec(dllexport)
@@ -71,7 +84,17 @@ typedef struct _UNICODE_STRING
 } UNICODE_STRING, *PUNICODE_STRING;
 
 //------------------------ Native function structures ------------------------
-
+#ifndef InitializeObjectAttributes
+#define InitializeObjectAttributes(p, n, a, r, s) \
+    {                                             \
+        (p)->Length = sizeof(OBJECT_ATTRIBUTES);  \
+        (p)->RootDirectory = r;                   \
+        (p)->Attributes = a;                      \
+        (p)->ObjectName = n;                      \
+        (p)->SecurityDescriptor = s;              \
+        (p)->SecurityQualityOfService = NULL;     \
+    }
+#endif
 typedef NTSTATUS(NTAPI* NtCreateFile)(
     _Out_ PHANDLE FileHandle,
     _In_ ACCESS_MASK DesiredAccess,
@@ -86,9 +109,13 @@ typedef NTSTATUS(NTAPI* NtCreateFile)(
     _In_ ULONG EaLength
 );
 
-typedef NTSTATUS(NTAPI* RtlInitUnicodeString)(
-    PUNICODE_STRING DestinationString,
-    PCWSTR SourceString
+typedef NTSTATUS(NTAPI* RtlInitUnicodeStringEx)(
+    _Out_ PUNICODE_STRING DestinationString,
+    _In_opt_z_ PCWSTR SourceString
+);
+
+typedef NTSTATUS (NTAPI* NtClose)(
+    _In_ HANDLE handle
 );
 
 // ------------------------ Not Native stuff ------------------------

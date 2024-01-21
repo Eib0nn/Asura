@@ -49,22 +49,24 @@ int fileCreation (const std::string &path){
         printf("unable to get a handle to NTDLL, error: 0x%lx", GetLastError());
     }
 
-    // get this more clean (and readable) and see how
-    // getting multiple modules of NTDLL inside another dll
-    // will work. tests and more tests lol
-    RtlInitUnicodeString thRtlInitUnicodeString = (RtlInitUnicodeString)GetProcAddress(hNTDLL, "RtlInitUnicodeString");
+    //Make a function to dont have this enormous line
+    //make  a cleanup GOT
+    //Make a good testing lol
+    RtlInitUnicodeStringEx thRtlInitUnicodeStringEx = (RtlInitUnicodeStringEx)GetProcAddress(hNTDLL, "RtlInitUnicodeString");
     NtCreateFile thNtCreateFile = (NtCreateFile)GetProcAddress(hNTDLL,"NtCreateFile");
     
     int i = 1;
     std::ostringstream oss;
     oss << path << "\\" << i << ".txt";
-    wchar_t* wideCharToString = AnsiToUnicode(oss.str());
-    
-    //thRtlInitUnicodeString(&usFileName, (PWSTR)oss.str());
-    // the code above doesnt work because unicode is ugly and require a UTF-16 string
-    // my code is ANSI so its UTF-8, so it doesnt fit in RtlInitUnicodeString()
-    // i will make a function to convert strings probably using MultiByteToWideChar()
-    // this will be a pain in the ass lol
+    wchar_t* wideCharToString = AnsiToUnicode(oss.str().c_str());
+    thRtlInitUnicodeStringEx(&usFileName, wideCharToString);
+    InitializeObjectAttributes(&oa, &usFileName, OBJ_CASE_INSENSITIVE, NULL, NULL);
+    ntStatus = thNtCreateFile(&hFileHandle, GENERIC_WRITE | GENERIC_READ, &oa, &IoStatus, NULL, FILE_ATTRIBUTE_NORMAL, FILE_SHARE_READ | FILE_SHARE_WRITE, FILE_OPEN,0,NULL,0);
+    if (ntStatus == NULL){
+        printf("Error when creating file with thNtCreateFile: 0x%lx", GetLastError());
+        NtClose(hFileHandle);
+        return EXIT_FAILURE;
+    }
     
     HANDLE hFile = CreateFileA(oss.str().c_str(), GENERIC_ALL, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_READONLY, NULL);
     
