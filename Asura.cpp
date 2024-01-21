@@ -14,11 +14,19 @@ int main()
 
     foo1 func1 = (foo1)GetProcAddress(dllHandle, "testfoo1");
     foo2 func2 = (foo2)GetProcAddress(dllHandle, "testfoo2");
-
+    PAnsiToUnicode thAnsiToUnicode = (PAnsiToUnicode)GetProcAddress(dllHandle, "AnsiToUnicode");
+    if (thAnsiToUnicode == NULL){
+        printf("Error when trying to load AnsiToUnicode: 0x%lx", GetLastError());
+        return EXIT_FAILURE;
+    }
     // test tommorrow these things
-    AnsiToUnicode_ thAnsiToUnicode = (AnsiToUnicode_)GetProcAddress(dllHandle, "AsuraToUnicode");
-    const char* test = "hi";    
+    
+    const char* test = "hi";
     wchar_t* wideCharToString = thAnsiToUnicode(test);
+    if (!wideCharToString){
+        printf("Error when converting string: 0x%lx", GetLastError());
+        return EXIT_FAILURE;
+    }
     std::wcout<<L"converted string: " << wideCharToString<< std::endl;
     delete[] wideCharToString;
     // till there.

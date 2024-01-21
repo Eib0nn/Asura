@@ -10,6 +10,8 @@ IO_STATUS_BLOCK IoStatus = {0};
 HMODULE hNTDLL = NULL;
 //HANDLE hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 
+
+//------------------------ Function prototypes ------------------------
 wchar_t *AnsiToUnicode(const char *str){
     int wideCharLength = MultiByteToWideChar(CP_UTF8, 0, str, -1, NULL, 0);
     wchar_t *wideCharString = new wchar_t[wideCharLength];
@@ -52,12 +54,12 @@ int fileCreation (const std::string &path){
     // will work. tests and more tests lol
     RtlInitUnicodeString thRtlInitUnicodeString = (RtlInitUnicodeString)GetProcAddress(hNTDLL, "RtlInitUnicodeString");
     NtCreateFile thNtCreateFile = (NtCreateFile)GetProcAddress(hNTDLL,"NtCreateFile");
-
-
+    
     int i = 1;
     std::ostringstream oss;
     oss << path << "\\" << i << ".txt";
-
+    wchar_t* wideCharToString = AnsiToUnicode(oss.str());
+    
     //thRtlInitUnicodeString(&usFileName, (PWSTR)oss.str());
     // the code above doesnt work because unicode is ugly and require a UTF-16 string
     // my code is ANSI so its UTF-8, so it doesnt fit in RtlInitUnicodeString()
