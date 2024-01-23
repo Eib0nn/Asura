@@ -8,6 +8,7 @@ HANDLE hFileHandle;
 OBJECT_ATTRIBUTES oa = {0};
 IO_STATUS_BLOCK IoStatus = {0};
 HMODULE hNTDLL = NULL;
+WINBOOL lib_cleanup;
 //HANDLE hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 
 
@@ -47,6 +48,8 @@ int fileCreation (const std::string &path){
     if (hNTDLL == NULL)
     {
         printf("unable to get a handle to NTDLL, error: 0x%lx", GetLastError());
+        CLEANUP(NULL,hNTDLL,NULL,NULL);
+        return EXIT_FAILURE;
     }
 
     //Make a function to dont have this enormous line
@@ -64,20 +67,13 @@ int fileCreation (const std::string &path){
     ntStatus = thNtCreateFile(&hFileHandle, GENERIC_WRITE | GENERIC_READ, &oa, &IoStatus, NULL, FILE_ATTRIBUTE_NORMAL, FILE_SHARE_READ | FILE_SHARE_WRITE, FILE_OPEN,0,NULL,0);
     if (ntStatus == NULL){
         printf("Error when creating file with thNtCreateFile: 0x%lx", GetLastError());
-        NtClose(hFileHandle);
+        CLEANUP(NULL, NULL, hFileHandle, NULL);
         return EXIT_FAILURE;
     }
     
-    HANDLE hFile = CreateFileA(oss.str().c_str(), GENERIC_ALL, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_READONLY, NULL);
+    //HANDLE hFile = CreateFileA(oss.str().c_str(), GENERIC_ALL, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_READONLY, NULL);
     
     oss.str("");
-    
-    if (hFile == INVALID_HANDLE_VALUE)
-    {
-        printf("Error when creatin file\n");
-        CloseHandle(hFile);
-        return 0;
-    }
     return 1;
 }
 
@@ -116,6 +112,53 @@ void iterate_subdirs(const std::string &dir_path, std::vector<std::string> &dirs
     } while (_findnext(handle, &file_info) == 0);
 
     _findclose(handle);
+}
+
+DWORD CLEANUP(_In_opt_ HANDLE _hProcess_, _In_opt_ HMODULE _dllHandle_, _In_opt_ HANDLE _hFileHandle_, _In_opt_ HANDLE _hThread_){
+    
+    NtClose thNtClose = (NtClose)GetProcAddress(hNTDLL, "NtClose");
+
+    if (_hProcess_ != NULL){
+        printf("Closing handle to injected process...");
+        ntStatus = thNtClose(_hProcess_);
+        if (!ntStatus == STATUS_SUCCESS){
+            printf("Failed to close process handle, error: 0x%x", ntStatus);
+            return EXIT_FAILURE;
+        }
+        printf("Closed handle.");
+    }
+
+    if (_hThread_ != NULL){
+        printf("Closing handle to thread....");
+        ntStatus = thNtClose(_hThread_);
+        if (!ntStatus == STATUS_SUCCESS){
+            printf("Failed to close thread handle, error: 0x%x", ntStatus);
+            return EXIT_FAILURE;
+        }
+        printf("Closed thread handle.");
+    }
+
+    if (_dllHandle_ != NULL){
+        printf("Freeing library handle...");
+        lib_cleanup = FreeLibrary(_dllHandle_);
+        if(lib_cleanup == 0){
+            printf("Failed to free library, error: 0x%lx", GetLastError());
+            return EXIT_FAILURE;
+        }
+        printf("Loaded library freed.");
+    }
+
+    if (_hFileHandle_ != NULL){
+        printf("Closing handle to file...");
+        ntStatus = thNtClose(_hFileHandle_);
+        if (!ntStatus == STATUS_SUCCESS){
+            printf("Failed to close file handle, error: 0x%x", ntStatus);
+            return EXIT_FAILURE;
+        }
+        printf("Closed file handle.");
+    }
+    printf("Finished the cleanup! bye bye");
+    return EXIT_SUCCESS;
 }
 
 void testfoo1(){

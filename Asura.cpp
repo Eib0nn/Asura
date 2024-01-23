@@ -28,7 +28,6 @@ int main()
         return EXIT_FAILURE;
     }
     std::wcout<<L"converted string: " << wideCharToString<< std::endl;
-    delete[] wideCharToString;
     // till there.
 
     if (func1 == NULL || func2 == NULL){
@@ -60,4 +59,5 @@ int main()
     */
    // make everything here as a dll call
 }
+
 
