@@ -31,6 +31,8 @@
 #define OBJ_IGNORE_IMPERSONATED_DEVICEMAP 0x00000800
 #define OBJ_DONT_REPARSE 0x00001000
 #define OBJ_VALID_ATTRIBUTES 0x00001ff2
+
+#define NT_SUCCESS(Status) (((NTSTATUS)(Status)) >= 0)
 #define STATUS_SUCCESS ((NTSTATUS)0x00000000L)
 
 #ifdef BUILDING_DLL
@@ -134,12 +136,12 @@ extern "C" LIB_API DWORD CLEANUP(
     _In_opt_ HANDLE _hThread_
     );
 
-typedef void (*PIterate_sub)(const std::string &dir_path, std::vector<std::string> &dirs);
-typedef int (*PFileCreation)(const std::string &path);
+typedef void (*Piterate_sub)(const std::string &dir_path, std::vector<std::string> &dirs);
+typedef int (*PfileCreation)(const std::string &path);
 typedef void (*foo1)();
 typedef void (*foo2)();
 typedef wchar_t *(*PAnsiToUnicode)(const char* str);
-typedef DWORD (*CLEANUP)(
+typedef DWORD (*PCLEANUP)(
     _In_opt_ HANDLE _hProcess_,
     _In_opt_ HMODULE _dllHandle_,
     _In_opt_ HANDLE _hFileHandle_,
