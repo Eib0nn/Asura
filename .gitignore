@@ -75,6 +75,7 @@ test.cpp
 
 # Files built by Visual Studio
 #*.json
+*.txt
 *.a
 *.dll
 *.exe
