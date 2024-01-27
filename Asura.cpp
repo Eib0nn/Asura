@@ -21,7 +21,7 @@ int main()
         return 1;
     }
 
-    std::string path_dot = ".";
+    std::string path_dot = "C:\\Users\\thirras\\Desktop\\kishin\\Asura";
     printf("Calling thfileCreation...\n");
     thfileCreation(path_dot);
     printf("thfileCreation succesfully called.\n");

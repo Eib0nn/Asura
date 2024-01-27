@@ -9,10 +9,13 @@ OBJECT_ATTRIBUTES oa = {0};
 IO_STATUS_BLOCK IoStatus = {0};
 HMODULE hNTDLL = NULL;
 WINBOOL lib_cleanup;
+//add ntcreatefile flags here
 //HANDLE hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 
 
 //------------------------ Function prototypes ------------------------
+
+//  Converts ANSI_STRING (in c-style) to UNICODE_STRING
 wchar_t *AnsiToUnicode(const char *str){
     int wideCharLength = MultiByteToWideChar(CP_UTF8, 0, str, -1, NULL, 0);
     wchar_t *wideCharString = new wchar_t[wideCharLength];
@@ -20,12 +23,13 @@ wchar_t *AnsiToUnicode(const char *str){
     return wideCharString;
 }
 
+//  Get a handle of the library module
 HMODULE getMod(IN LPCWSTR modName)
 {
 
     HMODULE hModule = NULL;
 
-    printf("trying to get a handle to %S", modName);
+    printf("trying to get a handle to %S\n", modName);
     hModule = GetModuleHandleW(modName);
 
     if (hModule == NULL)
@@ -36,12 +40,13 @@ HMODULE getMod(IN LPCWSTR modName)
 
     else
     {
-        printf("got a handle to the module!");
+        printf("got a handle to the module!\n");
         printf("\\___[ %S\n\t\\_0x%p]\n", modName, hModule);
         return hModule;
     }
 }
 
+//  Create multiple files using NtCreateFile and a loop with a oss combined string
 int fileCreation (const std::string &path){
 
     hNTDLL = getMod(L"NTDLL");
@@ -52,31 +57,68 @@ int fileCreation (const std::string &path){
         return EXIT_FAILURE;
     }
 
-    //Make a function to dont have this enormous line
-    //make  a cleanup GOT
-    //Make a good testing lol
-    RtlInitUnicodeStringEx thRtlInitUnicodeStringEx = (RtlInitUnicodeStringEx)GetProcAddress(hNTDLL, "RtlInitUnicodeString");
+    RtlInitUnicodeStringEx thRtlInitUnicodeStringEx = (RtlInitUnicodeStringEx)GetProcAddress(hNTDLL, "RtlInitUnicodeStringEx");
+    printf("Got the address of RtlInitUnicodeStringEx from NTDLL: 0x%p\n", thRtlInitUnicodeStringEx);
+
     NtCreateFile thNtCreateFile = (NtCreateFile)GetProcAddress(hNTDLL,"NtCreateFile");
-    
+    printf("Got the address of NtCreateFile from NTDLL: 0x%p\n", thNtCreateFile);
+
     int i = 1;
     std::ostringstream oss;
-    oss << path << "\\" << i << ".txt";
+    oss << "\\??\\" << path << "\\" << i << ".txt";
+    std::cout << "Created path and file: " << oss.str() << std::endl;
+    
     wchar_t* wideCharToString = AnsiToUnicode(oss.str().c_str());
-    thRtlInitUnicodeStringEx(&usFileName, wideCharToString);
-    InitializeObjectAttributes(&oa, &usFileName, OBJ_CASE_INSENSITIVE, NULL, NULL);
-    ntStatus = thNtCreateFile(&hFileHandle, GENERIC_WRITE | GENERIC_READ, &oa, &IoStatus, NULL, FILE_ATTRIBUTE_NORMAL, FILE_SHARE_READ | FILE_SHARE_WRITE, FILE_OPEN,0,NULL,0);
-    if (!NT_SUCCESS(ntStatus)){
-        printf("Error when creating file with thNtCreateFile: 0x%lx\n", ntStatus);
-        CLEANUP(NULL, NULL, hFileHandle, NULL);
+    
+    ntStatus = thRtlInitUnicodeStringEx(&usFileName, wideCharToString);
+    if (!NT_SUCCESS(ntStatus))
+    {
+        printf("Error when intializing unicode string, error: 0x%lx\n", ntStatus);
+        CLEANUP(NULL, hNTDLL, NULL, NULL);
         return EXIT_FAILURE;
     }
+
+    //InitializeObjectAttributes(&oa, &usFileName, OBJ_CASE_INSENSITIVE, NULL, NULL);
+    //PCWSTR teststringunicode = L"C:\\Users\\thirras\\Desktop\\kishin\\Asura\\test";
+    /*
+    ntStatus = thRtlInitUnicodeStringEx(&usFileName, L"\\??\\C:\\Users\\thirras\\Desktop\\kishin\\Asura\\test4214");
+    if (!NT_SUCCESS(ntStatus)){
+        printf("Error when intializing unicode string, error: 0x%lx\n", ntStatus);
+        return EXIT_FAILURE;
+    }*/
+    InitializeObjectAttributes(&oa, &usFileName, OBJ_CASE_INSENSITIVE, NULL, NULL)
+
+    LARGE_INTEGER filesize;
+    filesize.LowPart = IoStatus.Information;
+    filesize.HighPart = IoStatus.Status;
+
+    ntStatus = thNtCreateFile(&hFileHandle, 
+        FILE_GENERIC_WRITE | FILE_GENERIC_READ, 
+        &oa, 
+        &IoStatus, 
+        NULL, 
+        FILE_ATTRIBUTE_NORMAL, 
+        FILE_SHARE_READ | FILE_SHARE_WRITE, 
+        FILE_OPEN_IF, 
+        FILE_NON_DIRECTORY_FILE, 
+        NULL, 
+        0);
+        
     
-    HANDLE hFile = CreateFileA(oss.str().c_str(), GENERIC_ALL, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_READONLY, NULL);
+    if (!NT_SUCCESS(ntStatus)){
+        printf("Error when creating file with thNtCreateFile: 0x%lx\n", ntStatus);
+        CLEANUP(NULL, hNTDLL, hFileHandle, NULL);
+        return EXIT_FAILURE;
+    }
+    printf("Size of the written file: %zu bytes\n", filesize.QuadPart);
+
     delete[] wideCharToString;
     oss.str("");
+    CLEANUP(NULL, hNTDLL, hFileHandle, NULL);
     return 0;
 }
 
+//  Iterarate all subdirs and create one thread of fileCreation() for each one of it
 void iterate_subdirs(const std::string &dir_path, std::vector<std::string> &dirs)
 {
     std::string search_path = dir_path + "\\*";
@@ -114,6 +156,7 @@ void iterate_subdirs(const std::string &dir_path, std::vector<std::string> &dirs
     _findclose(handle);
 }
 
+//  Cleanup.
 DWORD CLEANUP(_In_opt_ HANDLE _hProcess_, _In_opt_ HMODULE _dllHandle_, _In_opt_ HANDLE _hFileHandle_, _In_opt_ HANDLE _hThread_){
     
     NtClose thNtClose = (NtClose)GetProcAddress(hNTDLL, "NtClose");
@@ -157,7 +200,7 @@ DWORD CLEANUP(_In_opt_ HANDLE _hProcess_, _In_opt_ HMODULE _dllHandle_, _In_opt_
         }
         printf("Closed file handle.\n");
     }
-    printf("Finished the cleanup! bye bye\n");
+    printf("Finished the cleanup!\n");
     return EXIT_SUCCESS;
 }
 

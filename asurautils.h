@@ -35,6 +35,23 @@
 #define NT_SUCCESS(Status) (((NTSTATUS)(Status)) >= 0)
 #define STATUS_SUCCESS ((NTSTATUS)0x00000000L)
 
+#ifndef InitializeObjectAttributes
+#define InitializeObjectAttributes(p, n, a, r, s) \
+    {                                             \
+        (p)->Length = sizeof(OBJECT_ATTRIBUTES);  \
+        (p)->RootDirectory = r;                   \
+        (p)->Attributes = a;                      \
+        (p)->ObjectName = n;                      \
+        (p)->SecurityDescriptor = s;              \
+        (p)->SecurityQualityOfService = NULL;     \
+    }
+#endif
+
+#define RTL_CONSTANT_STRING(s)                   \
+    {                                            \
+        sizeof(s) - sizeof((s)[0]), sizeof(s), s \
+    }
+
 #ifdef BUILDING_DLL
 #define LIB_API __declspec(dllexport)
 #else
@@ -87,17 +104,7 @@ typedef struct _UNICODE_STRING
 } UNICODE_STRING, *PUNICODE_STRING;
 
 //------------------------ Native function structures ------------------------
-#ifndef InitializeObjectAttributes
-#define InitializeObjectAttributes(p, n, a, r, s) \
-    {                                             \
-        (p)->Length = sizeof(OBJECT_ATTRIBUTES);  \
-        (p)->RootDirectory = r;                   \
-        (p)->Attributes = a;                      \
-        (p)->ObjectName = n;                      \
-        (p)->SecurityDescriptor = s;              \
-        (p)->SecurityQualityOfService = NULL;     \
-    }
-#endif
+
 typedef NTSTATUS(NTAPI* NtCreateFile)(
     _Out_ PHANDLE FileHandle,
     _In_ ACCESS_MASK DesiredAccess,
@@ -113,6 +120,11 @@ typedef NTSTATUS(NTAPI* NtCreateFile)(
 );
 
 typedef NTSTATUS(NTAPI* RtlInitUnicodeStringEx)(
+    _Out_ PUNICODE_STRING DestinationString,
+    _In_opt_z_ PCWSTR SourceString
+);
+
+typedef VOID(NTAPI* RtlInitUnicodeString)(
     _Out_ PUNICODE_STRING DestinationString,
     _In_opt_z_ PCWSTR SourceString
 );
