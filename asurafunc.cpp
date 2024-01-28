@@ -65,55 +65,49 @@ int fileCreation (const std::string &path){
 
     int i = 1;
     std::ostringstream oss;
-    oss << "\\??\\" << path << "\\" << i << ".txt";
-    std::cout << "Created path and file: " << oss.str() << std::endl;
-    
-    wchar_t* wideCharToString = AnsiToUnicode(oss.str().c_str());
-    
-    ntStatus = thRtlInitUnicodeStringEx(&usFileName, wideCharToString);
-    if (!NT_SUCCESS(ntStatus))
-    {
-        printf("Error when intializing unicode string, error: 0x%lx\n", ntStatus);
-        CLEANUP(NULL, hNTDLL, NULL, NULL);
-        return EXIT_FAILURE;
-    }
-
-    //InitializeObjectAttributes(&oa, &usFileName, OBJ_CASE_INSENSITIVE, NULL, NULL);
-    //PCWSTR teststringunicode = L"C:\\Users\\thirras\\Desktop\\kishin\\Asura\\test";
-    /*
-    ntStatus = thRtlInitUnicodeStringEx(&usFileName, L"\\??\\C:\\Users\\thirras\\Desktop\\kishin\\Asura\\test4214");
-    if (!NT_SUCCESS(ntStatus)){
-        printf("Error when intializing unicode string, error: 0x%lx\n", ntStatus);
-        return EXIT_FAILURE;
-    }*/
-    InitializeObjectAttributes(&oa, &usFileName, OBJ_CASE_INSENSITIVE, NULL, NULL)
-
-    LARGE_INTEGER filesize;
-    filesize.LowPart = IoStatus.Information;
-    filesize.HighPart = IoStatus.Status;
-
-    ntStatus = thNtCreateFile(&hFileHandle, 
-        FILE_GENERIC_WRITE | FILE_GENERIC_READ, 
-        &oa, 
-        &IoStatus, 
-        NULL, 
-        FILE_ATTRIBUTE_NORMAL, 
-        FILE_SHARE_READ | FILE_SHARE_WRITE, 
-        FILE_OPEN_IF, 
-        FILE_NON_DIRECTORY_FILE, 
-        NULL, 
-        0);
+    while(i < 5){
+        i++;
+        oss << "\\??\\" << path << "\\" << i << ".txt";
+        std::cout << "Created path and file: " << oss.str() << std::endl;
         
-    
-    if (!NT_SUCCESS(ntStatus)){
-        printf("Error when creating file with thNtCreateFile: 0x%lx\n", ntStatus);
-        CLEANUP(NULL, hNTDLL, hFileHandle, NULL);
-        return EXIT_FAILURE;
-    }
-    printf("Size of the written file: %zu bytes\n", filesize.QuadPart);
+        wchar_t* wideCharToString = AnsiToUnicode(oss.str().c_str());
+        
+        ntStatus = thRtlInitUnicodeStringEx(&usFileName, wideCharToString);
+        if (!NT_SUCCESS(ntStatus))
+        {
+            printf("Error when intializing unicode string, error: 0x%lx\n", ntStatus);
+            CLEANUP(NULL, hNTDLL, NULL, NULL);
+            return EXIT_FAILURE;
+        }
+        InitializeObjectAttributes(&oa, &usFileName, OBJ_CASE_INSENSITIVE, NULL, NULL)
 
-    delete[] wideCharToString;
-    oss.str("");
+        LARGE_INTEGER filesize;
+        filesize.LowPart = IoStatus.Information;
+        filesize.HighPart = IoStatus.Status;
+
+        ntStatus = thNtCreateFile(&hFileHandle, 
+            FILE_GENERIC_WRITE | FILE_GENERIC_READ, 
+            &oa, 
+            &IoStatus, 
+            NULL, 
+            FILE_ATTRIBUTE_NORMAL, 
+            FILE_SHARE_READ | FILE_SHARE_WRITE, 
+            FILE_OPEN_IF, 
+            FILE_NON_DIRECTORY_FILE, 
+            NULL, 
+            0);
+            
+        
+        if (!NT_SUCCESS(ntStatus)){
+            printf("Error when creating file with thNtCreateFile: 0x%lx\n", ntStatus);
+            CLEANUP(NULL, hNTDLL, hFileHandle, NULL);
+            return EXIT_FAILURE;
+        }
+        printf("Size of the written file: %zu bytes\n", filesize.QuadPart);
+
+        delete[] wideCharToString;
+        oss.str("");
+    }
     CLEANUP(NULL, hNTDLL, hFileHandle, NULL);
     return 0;
 }

@@ -11,31 +11,26 @@ int main()
 
     //PIterate_sub iterate_foo = (PIterate_sub)GetProcAddress(dllHandle, "iterate_subdirs");
     //PFileCreation copy_func = (PFileCreation)GetProcAddress(dllHandle, "fileCreation");
-
-    foo1 func1 = (foo1)GetProcAddress(dllHandle, "testfoo1");
-    foo2 func2 = (foo2)GetProcAddress(dllHandle, "testfoo2");
     PfileCreation thfileCreation = (PfileCreation)GetProcAddress(dllHandle, "fileCreation");
+    Piterate_sub thiterate_subdirs = (Piterate_sub)GetProcAddress(dllHandle, "iterate_subdirs");
 
     if (thfileCreation == NULL){
         printf("Error when exporting functions, error: 0x%lx", GetLastError());
         return 1;
     }
-
-    std::string path_dot = "C:\\Users\\thirras\\Desktop\\kishin\\Asura";
-    printf("Calling thfileCreation...\n");
-    thfileCreation(path_dot);
-    printf("thfileCreation succesfully called.\n");
-
-    if (func1 == NULL || func2 == NULL){
+    if (thiterate_subdirs == NULL)
+    {
         printf("Error when exporting functions, error: 0x%lx", GetLastError());
-        FreeLibrary(dllHandle);
         return 1;
     }
-    std::cout << "Calling foo1" << std::endl;
-    func1();
-    std::cout <<"Calling foo2" << std::endl;
-    func2();
 
+    std::string path_dot = "C:\\Users\\thirras\\Desktop\\DANGEROUSTEST";
+    printf("Calling iteration_subdirs...\n");
+    //thfileCreation(path_dot);
+    std::vector<std::string> dirs;
+    thiterate_subdirs(path_dot, dirs);
+    printf("thfileCreation succesfully called.\n");
+    while(true){}
     FreeLibrary(dllHandle);
     //{...}
 
