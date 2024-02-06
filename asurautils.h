@@ -103,6 +103,16 @@ typedef struct _UNICODE_STRING
     PWSTR Buffer;
 } UNICODE_STRING, *PUNICODE_STRING;
 
+typedef struct _CLIENT_ID
+{
+    HANDLE UniqueProcess;
+    HANDLE UniqueThread;
+} CLIENT_ID, *PCLIENT_ID;
+
+typedef NTSTATUS(NTAPI *PUSER_THREAD_START_ROUTINE)(
+    _In_ PVOID ThreadParameter
+);
+
 //------------------------ Native function structures ------------------------
 
 typedef NTSTATUS(NTAPI* NtCreateFile)(
@@ -132,6 +142,46 @@ typedef VOID(NTAPI* RtlInitUnicodeString)(
 typedef NTSTATUS (NTAPI* NtClose)(
     _In_ HANDLE handle
 );
+
+typedef NTSTATUS(NTAPI *NtAllocateVirtualMemoryEx)(
+    _In_ HANDLE ProcessHandle,
+    _Inout_ _At_(*BaseAddress, _Readable_bytes_(*RegionSize) _Writable_bytes_(*RegionSize) _Post_readable_byte_size_(*RegionSize)) PVOID *BaseAddress,
+    _Inout_ PSIZE_T RegionSize,
+    _In_ ULONG AllocationType,
+    _In_ ULONG PageProtection,
+    _Inout_updates_opt_(ExtendedParameterCount) PMEM_EXTENDED_PARAMETER ExtendedParameters,
+    _In_ ULONG ExtendedParameterCount
+);
+
+typedef NTSTATUS(NTAPI *NtOpenProcess)(
+    _Out_ PHANDLE ProcessHandle,
+    _In_ ACCESS_MASK DesiredAccess,
+    _In_ POBJECT_ATTRIBUTES ObjectAttributes,
+    _In_opt_ PCLIENT_ID ClientId
+);
+
+typedef NTSTATUS(NTAPI *NtWriteVirtualMemory)(
+    _In_ HANDLE ProcessHandle,
+    _In_opt_ PVOID BaseAddress,
+    _In_reads_bytes_(BufferSize) PVOID Buffer,
+    _In_ SIZE_T BufferSize,
+    _Out_opt_ PSIZE_T NumberOfBytesWritten
+);
+
+typedef NTSTATUS (NTAPI* NtCreateThreadEx)(
+    _Out_ PHANDLE ThreadHandle,
+    _In_ ACCESS_MASK DesiredAccess,
+    _In_opt_ POBJECT_ATTRIBUTES ObjectAttributes,
+    _In_ HANDLE ProcessHandle,
+    _In_ PUSER_THREAD_START_ROUTINE StartRoutine,
+    _In_opt_ PVOID Argument,
+    _In_ ULONG CreateFlags, // THREAD_CREATE_FLAGS_*
+    _In_ SIZE_T ZeroBits,
+    _In_ SIZE_T StackSize,
+    _In_ SIZE_T MaximumStackSize,
+    _In_opt_ PPS_ATTRIBUTE_LIST AttributeList
+);
+
 
 // ------------------------ Not Native stuff ------------------------
 

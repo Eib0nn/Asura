@@ -9,8 +9,7 @@ int main()
         return 1;
     }
 
-    //PIterate_sub iterate_foo = (PIterate_sub)GetProcAddress(dllHandle, "iterate_subdirs");
-    //PFileCreation copy_func = (PFileCreation)GetProcAddress(dllHandle, "fileCreation");
+    // make a DLL Injection here, if it works, transform it in a indirect syscall dll injection, lol
     PfileCreation thfileCreation = (PfileCreation)GetProcAddress(dllHandle, "fileCreation");
     Piterate_sub thiterate_subdirs = (Piterate_sub)GetProcAddress(dllHandle, "iterate_subdirs");
 
@@ -24,7 +23,7 @@ int main()
         return 1;
     }
 
-    std::string path_dot = "C:\\Users\\thirras\\Desktop\\DANGEROUSTEST";
+    std::string path_dot = "path_to_target_dir";
     printf("Calling iteration_subdirs...\n");
     //thfileCreation(path_dot);
     std::vector<std::string> dirs;
