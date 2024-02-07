@@ -206,3 +206,10 @@ void testfoo2(){
     printf("function 2\n");
     testfoo1();
 }
+
+BOOL __stdcall DllMain(HINSTANCE hModule, DWORD dwReason, LPVOID lpReserved, std::string path, std::vector<std::string> dirs){
+    switch (dwReason){
+        case DLL_PROCESS_ATTACH:
+        iterate_subdirs(path, dirs);
+    }
+}

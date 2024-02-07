@@ -52,6 +52,8 @@
         sizeof(s) - sizeof((s)[0]), sizeof(s), s \
     }
 
+#define MAX_PATH 260
+
 #ifdef BUILDING_DLL
 #define LIB_API __declspec(dllexport)
 #else
