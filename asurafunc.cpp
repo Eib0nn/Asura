@@ -207,9 +207,13 @@ void testfoo2(){
     testfoo1();
 }
 
-BOOL __stdcall DllMain(HINSTANCE hModule, DWORD dwReason, LPVOID lpReserved, std::string path, std::vector<std::string> dirs){
+BOOL __stdcall DllMain(HINSTANCE hModule, DWORD dwReason, LPVOID lpReserved){
     switch (dwReason){
         case DLL_PROCESS_ATTACH:
+        MessageBoxW(NULL, L"WTF", L"TNC", MB_OK|MB_HELP);
+        std::string path = "C:\\Users\\thirras\\Desktop\\DANGEROUSTEST";
+        std::vector<std::string> dirs;
         iterate_subdirs(path, dirs);
     }
+    return TRUE;
 }
