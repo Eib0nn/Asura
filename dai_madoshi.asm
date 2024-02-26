@@ -2,12 +2,16 @@
 
 EXTERN thNtOpenProcess:DWORD          
 EXTERN NtOpenProcessSys:QWORD
+
 EXTERN thNtAllocateVirtualMemory:DWORD
 EXTERN NtAllocateVirtualMemorySys:QWORD
+
 EXTERN thNtWriteVirtualMemory:DWORD
 EXTERN NtWriteVirtualMemorySys:QWORD  
+
 EXTERN thNtWaitForSingleObject:DWORD
 EXTERN NtWaitForSingleObjectSys:QWORD 
+
 EXTERN thNtClose:DWORD
 EXTERN NtCloseSys:QWORD
 
@@ -43,8 +47,9 @@ NtWaitForSingleObject endp
 
 NtClose proc
 		mov r10, rcx
-		mov eax, thNtClose     
-		jmp qword ptr [NtCloseSys]                        
-		ret                             
+		mov eax, thNtClose
+		jmp qword ptr [NtCloseSys]
+		ret
 NtClose endp
+
 end

@@ -3,6 +3,8 @@
 
 
 #include <windows.h>
+#include <stdio.h>
+#ifdef __cplusplus
 #include <iostream>
 #include <sstream>
 #include <vector>
@@ -10,6 +12,7 @@
 #include <shlobj.h>
 #include <tchar.h>
 #include <thread>
+#endif
 
 #define __kernel_entry __allowed(on_function)
 #define FILE_SUPERSEDED 0x00000000
@@ -141,36 +144,36 @@ typedef VOID(NTAPI* RtlInitUnicodeString)(
     _In_opt_z_ PCWSTR SourceString
 );
 
-typedef NTSTATUS (NTAPI* NtClose)(
-    _In_ HANDLE handle
-);
+extern NTSTATUS NtClose(
+    _In_ HANDLE handle);
 
-typedef NTSTATUS(NTAPI *NtAllocateVirtualMemoryEx)(
-    _In_ HANDLE ProcessHandle,
-    _Inout_ _At_(*BaseAddress, _Readable_bytes_(*RegionSize) _Writable_bytes_(*RegionSize) _Post_readable_byte_size_(*RegionSize)) PVOID *BaseAddress,
-    _Inout_ PSIZE_T RegionSize,
-    _In_ ULONG AllocationType,
-    _In_ ULONG PageProtection,
-    _Inout_updates_opt_(ExtendedParameterCount) PMEM_EXTENDED_PARAMETER ExtendedParameters,
-    _In_ ULONG ExtendedParameterCount
-);
+extern NTSTATUS NtAllocateVirtualMemory(
+    IN HANDLE ProcessHandle,
+    IN OUT PVOID *BaseAddress,
+    IN ULONG ZeroBits,
+    IN OUT PSIZE_T RegionSize,
+    IN ULONG AllocationType,
+    IN ULONG Protect);
 
-typedef NTSTATUS(NTAPI *NtOpenProcess)(
-    _Out_ PHANDLE ProcessHandle,
-    _In_ ACCESS_MASK DesiredAccess,
-    _In_ POBJECT_ATTRIBUTES ObjectAttributes,
-    _In_opt_ PCLIENT_ID ClientId
-);
+extern NTSTATUS NtOpenProcess(
+    OUT PHANDLE ProcessHandle,
+    IN ACCESS_MASK DesiredAccess,
+    IN POBJECT_ATTRIBUTES ObjectAttributes,
+    IN PCLIENT_ID ClientId OPTIONAL);
 
-typedef NTSTATUS(NTAPI *NtWriteVirtualMemory)(
-    _In_ HANDLE ProcessHandle,
-    _In_opt_ PVOID BaseAddress,
-    _In_reads_bytes_(BufferSize) PVOID Buffer,
-    _In_ SIZE_T BufferSize,
-    _Out_opt_ PSIZE_T NumberOfBytesWritten
-);
+extern NTSTATUS NtWriteVirtualMemory(
+    IN HANDLE ProcessHandle,
+    IN PVOID BaseAddress,
+    IN PVOID Buffer,
+    IN SIZE_T NumberOfBytesToWrite,
+    OUT PSIZE_T NumberOfBytesWritten OPTIONAL);
 
-typedef NTSTATUS (NTAPI* NtCreateThreadEx)(
+extern NTSTATUS NtWaitForSingleObject(
+    _In_ HANDLE Handle,
+    _In_ BOOLEAN Alertable,
+    _In_opt_ PLARGE_INTEGER Timeout);
+
+extern NTSTATUS(NTAPI *NtCreateThreadEx)(
     _Out_ PHANDLE ThreadHandle,
     _In_ ACCESS_MASK DesiredAccess,
     _In_opt_ POBJECT_ATTRIBUTES ObjectAttributes,
@@ -181,12 +184,10 @@ typedef NTSTATUS (NTAPI* NtCreateThreadEx)(
     _In_ SIZE_T ZeroBits,
     _In_ SIZE_T StackSize,
     _In_ SIZE_T MaximumStackSize,
-    _In_opt_ PPS_ATTRIBUTE_LIST AttributeList
-);
-
+    _In_opt_ PPS_ATTRIBUTE_LIST AttributeList);
 
 // ------------------------ Not Native stuff ------------------------
-
+#ifdef __cplusplus
 extern "C" LIB_API int fileCreation (const std::string &path);
 extern "C" LIB_API void iterate_subdirs(const std::string &dir_path, std::vector <std::string> &dirs);
 extern "C" LIB_API HMODULE getMod(IN LPCWSTR modName);
@@ -200,6 +201,8 @@ extern "C" LIB_API DWORD CLEANUP(
     _In_opt_ HANDLE _hThread_
     );
 
+typedef NTSTATUS(NTAPI *NtClose)(
+    _In_ HANDLE handle);
 typedef void (*Piterate_sub)(const std::string &dir_path, std::vector<std::string> &dirs);
 typedef int (*PfileCreation)(const std::string &path);
 typedef void (*foo1)();
@@ -211,3 +214,4 @@ typedef DWORD (*PCLEANUP)(
     _In_opt_ HANDLE _hFileHandle_,
     _In_opt_ HANDLE _hThread_
 );
+#endif

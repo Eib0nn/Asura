@@ -1,3 +1,9 @@
 #include "asurautils.h"
 
-VOID dll_injection(int PID);
+BOOL dll_injection(DWORD PID);
+VOID IndirectPrelude(
+    IN HMODULE hNTDLL,
+    IN LPCSTR NtFunction,
+    OUT DWORD *SSN,
+    OUT UINT_PTR *Syscall
+);

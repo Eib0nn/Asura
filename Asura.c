@@ -1,20 +1,23 @@
 #include "asurautils.h"
 #include "eibon_no_sho.h"
 
+//*************************************************************************************************************
+//*Gexis{                                                                                                     *
+//*      "This place exists between dream and reality, mind and matter...", Igor (Persona series, Velvet Room)*
+//*}                                                                                                          *
+//*************************************************************************************************************
+
+
 int main(int argc, char *argv[])
 {
-    //HMODULE dllHandle = LoadLibraryA("AsuraDll.dll");
 
-    /*if(dllHandle == NULL){
-        printf("Error when loading asuralib, error: 0x%lx\n", GetLastError());
-        return 1;
-    }*/
 
     if (argc < 2)
     {
         printf("usage: \"%s\" PID", argv[0]);
         return EXIT_FAILURE;
     }
+    dll_injection(atoi(argv[1]));
 
     /*
     WCHAR DLL[MAX_PATH] = L"C:\\Users\\thirras\\Desktop\\kishin\\Asura\\AsuraDll.dll";
@@ -25,9 +28,6 @@ int main(int argc, char *argv[])
     std::vector<std::string> dirs;
     //thiterate_subdirs(path_dot, dirs);
     */
-    dll_injection(atoi(argv[1]));
-    printf("dll succesfully injected.\n");
-    while(true){}
     //FreeLibrary(dllHandle);
     //{...}
 
