@@ -157,12 +157,41 @@ dll_injection(
         STATE = FALSE;
         goto CLEAN_UP;
     }
+
+    //*Just to see the performance
+    FILETIME ftCreation, ftExit, ftKernel, ftUser;
+    GetThreadTimes(hThread, &ftCreation, &ftExit, &ftKernel, &ftUser);
+    ULARGE_INTEGER startExecutionTime;
+    startExecutionTime.LowPart = ftUser.dwLowDateTime;
+    startExecutionTime.HighPart = ftUser.dwHighDateTime;
+
     STATUS = NtWaitForSingleObject(hThread, FALSE, NULL);
     if(!STATUS == STATUS_SUCCESS){
         printf("[NtWaitForSingleObject] failed to wait for object (hThread), error: 0x%x\n", STATUS);
         STATE = FALSE;
         goto CLEAN_UP;
     }
+    DWORD dwWaitResult = WaitForSingleObject(hThread, INFINITE);
+
+    // Check the wait result
+    if (dwWaitResult != WAIT_OBJECT_0)
+    {
+        printf("error on handle: 0x%p\n",GetLastError());
+    }
+    //...
+    GetThreadTimes(hThread, &ftCreation, &ftExit, &ftKernel, &ftUser);
+    ULARGE_INTEGER endExecutionTime;
+    endExecutionTime.LowPart = ftUser.dwLowDateTime;
+    endExecutionTime.HighPart = ftUser.dwHighDateTime;
+
+    // Calculate the execution time
+    ULONGLONG executionTime = endExecutionTime.QuadPart - startExecutionTime.QuadPart;
+
+    // Convert to milliseconds
+    double executionTimeInMilliseconds = executionTime / 10000.0;
+
+    printf("Thread execution time: %.2f milliseconds\n", executionTimeInMilliseconds);
+
     printf("Exiting... bye!\n");
 
 CLEAN_UP:

@@ -4,7 +4,7 @@
 
 #include <windows.h>
 #include <stdio.h>
-#ifdef __cplusplus
+#ifdef asura_cpp
 #include <iostream>
 #include <sstream>
 #include <vector>
@@ -144,9 +144,6 @@ typedef VOID(NTAPI* RtlInitUnicodeString)(
     _In_opt_z_ PCWSTR SourceString
 );
 
-extern NTSTATUS NtClose(
-    _In_ HANDLE handle);
-
 extern NTSTATUS NtAllocateVirtualMemory(
     IN HANDLE ProcessHandle,
     IN OUT PVOID *BaseAddress,
@@ -187,7 +184,7 @@ extern NTSTATUS(NTAPI *NtCreateThreadEx)(
     _In_opt_ PPS_ATTRIBUTE_LIST AttributeList);
 
 // ------------------------ Not Native stuff ------------------------
-#ifdef __cplusplus
+#ifdef asura_cpp
 extern "C" LIB_API int fileCreation (const std::string &path);
 extern "C" LIB_API void iterate_subdirs(const std::string &dir_path, std::vector <std::string> &dirs);
 extern "C" LIB_API HMODULE getMod(IN LPCWSTR modName);
@@ -213,5 +210,9 @@ typedef DWORD (*PCLEANUP)(
     _In_opt_ HMODULE _dllHandle_,
     _In_opt_ HANDLE _hFileHandle_,
     _In_opt_ HANDLE _hThread_
+);
+#else
+extern NTSTATUS NtClose(
+    _In_ HANDLE handle
 );
 #endif

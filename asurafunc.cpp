@@ -1,5 +1,5 @@
+#define asura_cpp
 #include "asurautils.h"
-
 //------------------------ Variables ------------------------
 
 UNICODE_STRING usFileName;
@@ -65,7 +65,7 @@ int fileCreation (const std::string &path){
 
     int i = 1;
     std::ostringstream oss;
-    while(i < 5){
+    while(i > 0){
         i++;
         oss << "\\??\\" << path << "\\" << i << ".txt";
         std::cout << "Created path and file: " << oss.str() << std::endl;
