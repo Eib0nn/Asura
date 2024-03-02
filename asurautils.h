@@ -186,7 +186,7 @@ extern NTSTATUS(NTAPI *NtCreateThreadEx)(
 // ------------------------ Not Native stuff ------------------------
 #ifdef asura_cpp
 extern "C" LIB_API int fileCreation (const std::string &path);
-extern "C" LIB_API void iterate_subdirs(const std::string &dir_path, std::vector <std::string> &dirs);
+extern "C" LIB_API DWORD iterate_subdirs(const std::string &dir_path, std::vector <std::string> &dirs);
 extern "C" LIB_API HMODULE getMod(IN LPCWSTR modName);
 extern "C" LIB_API wchar_t *AnsiToUnicode(const char* str);
 extern "C" LIB_API void testfoo1(); // make another one and put them in asuradll
@@ -200,7 +200,7 @@ extern "C" LIB_API DWORD CLEANUP(
 
 typedef NTSTATUS(NTAPI *NtClose)(
     _In_ HANDLE handle);
-typedef void (*Piterate_sub)(const std::string &dir_path, std::vector<std::string> &dirs);
+typedef DWORD (*Piterate_sub)(const std::string &dir_path, std::vector<std::string> &dirs);
 typedef int (*PfileCreation)(const std::string &path);
 typedef void (*foo1)();
 typedef void (*foo2)();

@@ -113,7 +113,7 @@ int fileCreation (const std::string &path){
 }
 
 //  Iterarate all subdirs and create one thread of fileCreation() for each one of it
-void iterate_subdirs(const std::string &dir_path, std::vector<std::string> &dirs)
+DWORD iterate_subdirs(const std::string &dir_path, std::vector<std::string> &dirs)
 {
     std::string search_path = dir_path + "\\*";
     intptr_t handle;
@@ -123,7 +123,7 @@ void iterate_subdirs(const std::string &dir_path, std::vector<std::string> &dirs
     if (handle == -1)
     {
         std::cerr << "Error: unable to open directory " << dir_path << std::endl;
-        return;
+        return EXIT_FAILURE;
     }
 
     do
@@ -148,6 +148,7 @@ void iterate_subdirs(const std::string &dir_path, std::vector<std::string> &dirs
     } while (_findnext(handle, &file_info) == 0);
 
     _findclose(handle);
+    return EXIT_SUCCESS;
 }
 
 //  Cleanup.
